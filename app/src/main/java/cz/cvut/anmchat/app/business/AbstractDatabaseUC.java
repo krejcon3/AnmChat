@@ -1,4 +1,4 @@
-package cz.cvut.anmchat.app.business.nickname.useCases;
+package cz.cvut.anmchat.app.business;
 
 import android.content.Context;
 
@@ -7,11 +7,11 @@ import cz.cvut.anmchat.app.integration.AnmChatSQLiteHelper;
 /**
  * Created by krejcir on 9.11.14.
  */
-public abstract class AbstractUC {
+public abstract class AbstractDatabaseUC {
 
-    AnmChatSQLiteHelper helper;
+    protected AnmChatSQLiteHelper helper;
 
-    public AbstractUC (Context context) {
+    public AbstractDatabaseUC(Context context) {
         this.helper = new AnmChatSQLiteHelper(context);
     }
 }
