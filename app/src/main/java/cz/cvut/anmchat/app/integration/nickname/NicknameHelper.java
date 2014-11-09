@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.LinkedList;
 
 import cz.cvut.anmchat.app.business.nickname.Nickname;
+import cz.cvut.anmchat.app.integration.IntegrationException;
 
 /**
  * Created by krejcir on 9.11.14.
@@ -27,11 +28,14 @@ public class NicknameHelper {
         this.db = db;
     }
 
-    public void create(Nickname n) {
-        db.insert(TABLE_NAME, null, this.toValues(n));
+    public void create(Nickname n) throws IntegrationException {
+        long id = db.insert(TABLE_NAME, null, this.toValues(n));
+        if (id == -1) {
+            throw new IntegrationException("Nickname can't be crated.");
+        }
     }
 
-    public Nickname find(long id) {
+    public Nickname find(long id) throws IntegrationException {
         Cursor c = db.query(
                 TABLE_NAME,
                 new String[]{KEY_ID, KEY_NAME, KEY_HASH},
@@ -46,9 +50,9 @@ public class NicknameHelper {
             c.moveToFirst();
             return toObject(c);
         }
-        return null;
+        throw new IntegrationException("Nickname not found.");
     }
-    public Nickname find(String hash) {
+    public Nickname find(String hash) throws IntegrationException {
         Cursor c = db.query(
                 TABLE_NAME,
                 new String[]{KEY_ID, KEY_NAME, KEY_HASH},
@@ -63,9 +67,9 @@ public class NicknameHelper {
             c.moveToFirst();
             return toObject(c);
         }
-        return null;
+        throw new IntegrationException("Nickname not found.");
     }
-    public LinkedList<Nickname> find() {
+    public LinkedList<Nickname> find() throws IntegrationException {
         LinkedList<Nickname> list = new LinkedList<Nickname>();
         Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
         if (c != null) {
@@ -74,7 +78,7 @@ public class NicknameHelper {
                list.add(this.toObject(c));
             } while (c.moveToNext());
         }
-        return null;
+        throw new IntegrationException("Nickname not found.");
     }
 
     private Nickname toObject(Cursor cursor) {

@@ -38,17 +38,17 @@ public class AnmChatSQLiteHelper extends SQLiteOpenHelper {
         }
     }
 
-    public void create(Nickname n) {
+    public void create(Nickname n) throws IntegrationException {
         this.nicknameHelper.create(n);
     }
 
-    public Nickname find(long id) {
+    public Nickname find(long id) throws IntegrationException {
         return this.nicknameHelper.find(id);
     }
-    public Nickname find(String hash) {
+    public Nickname find(String hash) throws IntegrationException {
         return this.nicknameHelper.find(hash);
     }
-    public LinkedList<Nickname> find() {
+    public LinkedList<Nickname> find() throws IntegrationException {
         return this.nicknameHelper.find();
     }
 }
