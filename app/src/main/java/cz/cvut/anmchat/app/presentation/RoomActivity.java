@@ -29,6 +29,7 @@ public class RoomActivity extends Activity implements View.OnClickListener {
     private long roomId;
     private String roomName;
     protected LinkedList<Message> list;
+    private MessageDecorator messageDecorator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,8 @@ public class RoomActivity extends Activity implements View.OnClickListener {
         this.myHash = intent.getStringExtra("myHash");
         this.roomName = intent.getStringExtra("roomName");
         this.roomId = intent.getLongExtra("roomId", -1);
+
+        this.messageDecorator = new MessageDecorator(this.myHash, this.getApplicationContext());
 
         setTitle(getTitle() + " - " + this.roomName);
 
@@ -69,14 +72,10 @@ public class RoomActivity extends Activity implements View.OnClickListener {
     private void setList() {
         try {
             this.list = new GetMessagesUC().getAll(this.roomId);
+            this.list = this.messageDecorator.decorate(this.list);
             ListView msgList = (ListView) findViewById(R.id.list);
             MessageAdapter adapter = new MessageAdapter(this.list, getApplicationContext());
             msgList.setAdapter(adapter);
-            msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                }
-            });
         } catch (BusinessException e) {
             e.printStackTrace();
         }
