@@ -2,6 +2,8 @@ package cz.cvut.anmchat.app.business.nickname.useCases;
 
 import android.content.Context;
 
+import java.util.HashMap;
+
 import cz.cvut.anmchat.app.business.AbstractDatabaseUC;
 import cz.cvut.anmchat.app.business.BusinessException;
 import cz.cvut.anmchat.app.business.nickname.Nickname;
@@ -21,18 +23,7 @@ public class GenerateNicknameUC extends AbstractDatabaseUC {
         this.initSecondNames();
     }
 
-    public void generate(String hash) throws BusinessException {
-        Nickname n = new Nickname();
-        n.setNickname(this.getName());
-        n.setHash(hash);
-        try {
-            this.helper.create(n);
-        } catch (IntegrationException e) {
-            throw new BusinessException(e.getMessage());
-        }
-    }
-
-    public String getName() {
+    public String generate() {
         int findex = (int)(Math.random() * this.firstNames.length);
         int sindex = (int)(Math.random() * this.secondNames.length);
         return this.firstNames[findex] + " " + this.secondNames[sindex];

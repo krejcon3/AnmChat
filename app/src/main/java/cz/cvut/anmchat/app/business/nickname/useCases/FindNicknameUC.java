@@ -2,6 +2,7 @@ package cz.cvut.anmchat.app.business.nickname.useCases;
 
 import android.content.Context;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import cz.cvut.anmchat.app.business.AbstractDatabaseUC;
@@ -18,7 +19,7 @@ public class FindNicknameUC extends AbstractDatabaseUC {
         super(context);
     }
 
-    public Nickname Nickname(long id) throws BusinessException {
+    public Nickname find(long id) throws BusinessException {
         try {
             return this.helper.find(id);
         } catch (IntegrationException e) {
@@ -26,7 +27,7 @@ public class FindNicknameUC extends AbstractDatabaseUC {
         }
     }
 
-    public Nickname Nickname(String hash) throws BusinessException {
+    public Nickname find(String hash) throws BusinessException {
         try {
             return this.helper.find(hash);
         } catch (IntegrationException e) {
@@ -34,11 +35,7 @@ public class FindNicknameUC extends AbstractDatabaseUC {
         }
     }
 
-    public LinkedList<Nickname> Nickname() throws BusinessException {
-        try {
-            return this.helper.find();
-        } catch (IntegrationException e) {
-            throw new BusinessException(e.getMessage());
-        }
+    public HashMap<String, Nickname> find() throws BusinessException {
+        return this.helper.find();
     }
 }
