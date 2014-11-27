@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 
 import cz.cvut.anmchat.app.business.nickname.Nickname;
 import cz.cvut.anmchat.app.integration.IntegrationException;
@@ -22,21 +22,23 @@ public class NicknameHelper {
     public static final String TABLE_DEFINITON = "CREATE TABLE " + TABLE_NAME + " (" + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " + KEY_NAME + " VARCHAR, " + KEY_HASH + " VARCHAR)";
     public static final String TABLE_DROP = "DROP TABLE IF EXISTS nicknames";
 
-    private SQLiteDatabase db;
+    private SQLiteDatabase readableDatabase;
+    private SQLiteDatabase writeableDatabase;
 
-    public NicknameHelper(SQLiteDatabase db) {
-        this.db = db;
+    public NicknameHelper(SQLiteDatabase readableDatabase, SQLiteDatabase writeableDatabase) {
+        this.readableDatabase = readableDatabase;
+        this.writeableDatabase = writeableDatabase;
     }
 
     public void create(Nickname n) throws IntegrationException {
-        long id = db.insert(TABLE_NAME, null, this.toValues(n));
+        long id = this.writeableDatabase.insert(TABLE_NAME, null, this.toValues(n));
         if (id == -1) {
             throw new IntegrationException("Nickname can't be crated.");
         }
     }
 
     public Nickname find(long id) throws IntegrationException {
-        Cursor c = db.query(
+        Cursor c = this.readableDatabase.query(
                 TABLE_NAME,
                 new String[]{KEY_ID, KEY_NAME, KEY_HASH},
                 "id = ?",
@@ -46,14 +48,14 @@ public class NicknameHelper {
                 null,
                 null
         );
-        if (c != null) {
+        if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             return toObject(c);
         }
         throw new IntegrationException("Nickname not found.");
     }
     public Nickname find(String hash) throws IntegrationException {
-        Cursor c = db.query(
+        Cursor c = this.readableDatabase.query(
                 TABLE_NAME,
                 new String[]{KEY_ID, KEY_NAME, KEY_HASH},
                 "hash = ?",
@@ -63,22 +65,24 @@ public class NicknameHelper {
                 null,
                 null
         );
-        if (c != null) {
+        if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             return toObject(c);
         }
         throw new IntegrationException("Nickname not found.");
     }
-    public LinkedList<Nickname> find() throws IntegrationException {
-        LinkedList<Nickname> list = new LinkedList<Nickname>();
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME, null);
-        if (c != null) {
+    public HashMap<String, Nickname> find() {
+        HashMap<String, Nickname> map = new HashMap<String, Nickname>();
+        Cursor c = this.readableDatabase.rawQuery("SELECT * FROM " + TABLE_NAME, null);
+        Nickname nickname;
+        if (c != null && c.getCount() > 0) {
             c.moveToFirst();
             do {
-               list.add(this.toObject(c));
+               nickname = this.toObject(c);
+               map.put(nickname.getHash(), nickname);
             } while (c.moveToNext());
         }
-        throw new IntegrationException("Nickname not found.");
+        return map;
     }
 
     private Nickname toObject(Cursor cursor) {

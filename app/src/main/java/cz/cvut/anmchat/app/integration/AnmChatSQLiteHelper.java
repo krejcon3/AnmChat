@@ -3,7 +3,9 @@ package cz.cvut.anmchat.app.integration;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import cz.cvut.anmchat.app.business.nickname.Nickname;
@@ -22,7 +24,7 @@ public class AnmChatSQLiteHelper extends SQLiteOpenHelper {
 
     public AnmChatSQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
-        nicknameHelper = new NicknameHelper(this.getReadableDatabase());
+        nicknameHelper = new NicknameHelper(this.getReadableDatabase(), this.getWritableDatabase());
     }
 
     @Override
@@ -48,7 +50,7 @@ public class AnmChatSQLiteHelper extends SQLiteOpenHelper {
     public Nickname find(String hash) throws IntegrationException {
         return this.nicknameHelper.find(hash);
     }
-    public LinkedList<Nickname> find() throws IntegrationException {
+    public HashMap<String, Nickname> find() {
         return this.nicknameHelper.find();
     }
 }

@@ -9,6 +9,14 @@ public class Nickname {
     private String nickname;
     private String hash;
 
+    public Nickname() {
+    }
+
+    public Nickname(String nickname, String hash) {
+        this.nickname = nickname;
+        this.hash = hash;
+    }
+
     public long getId() {
         return id;
     }
