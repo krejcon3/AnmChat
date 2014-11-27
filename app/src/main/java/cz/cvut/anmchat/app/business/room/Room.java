@@ -7,6 +7,7 @@ public class Room {
 
     private long id;
     private String name;
+    private String created;
 
     public Room(String name) {
         this.name = name;
@@ -31,5 +32,13 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getCreated() {
+        return created;
+    }
+
+    public void setCreated(String created) {
+        this.created = created;
     }
 }

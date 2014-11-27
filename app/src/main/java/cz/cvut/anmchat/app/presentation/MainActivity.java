@@ -34,7 +34,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_main);
 
         if (myHash == null) {
-            // get hash from server
             try {
                 myHash = new GetOwnHashUC().get();
             } catch (BusinessException e) {
@@ -62,7 +61,20 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void setList() {
-        new GetRoomsAsyncTask().execute(this.getApplicationContext());
+        try {
+            this.list = new GetRoomsUC().getAll();
+            ListView msgList = (ListView) findViewById(R.id.list);
+            RoomAdapter adapter = new RoomAdapter(this.list, getApplicationContext());
+            msgList.setAdapter(adapter);
+            msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    startRoomActivity(position, id);
+                }
+            });
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
     }
 
     private void startRoomActivity(int position, long id) {
@@ -75,7 +87,11 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void createRoom(String name) {
-        new CreateRoomAsyncTask().execute(new Room(name));
+        try {
+            new CreateRoomUC().create(new Room(name));
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -89,54 +105,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 break;
             default:
                 Log.e("MSL", "Undefined button pressed.");
-        }
-    }
-
-    private class GetRoomsAsyncTask extends AsyncTask<Context, Void, LinkedList<Room>> {
-
-        @Override
-        protected LinkedList<Room> doInBackground(Context... c) {
-            GetRoomsUC uc = new GetRoomsUC();
-            LinkedList<Room> list = new LinkedList<Room>();
-            try {
-                list = uc.getAll();
-            } catch (BusinessException e) {
-                Log.e("ERROR", e.getMessage());
-            } finally {
-                return list;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final LinkedList<Room> rooms) {
-            super.onPostExecute(rooms);
-            list = rooms;
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    ListView msgList = (ListView) findViewById(R.id.list);
-                    RoomAdapter adapter = new RoomAdapter(rooms, getApplicationContext());
-                    msgList.setAdapter(adapter);
-                    msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            startRoomActivity(position, id);
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    private class CreateRoomAsyncTask extends AsyncTask<Room, Void, Void> {
-        @Override
-        protected Void doInBackground(Room... r) {
-            try {
-                new CreateRoomUC().create(r[0]);
-                Toast.makeText(getApplicationContext(), r[0].getName(), Toast.LENGTH_SHORT).show();
-            } catch (BusinessException e) {
-                Log.e("ERROR", e.getMessage());
-            }
-            return null;
         }
     }
 }
