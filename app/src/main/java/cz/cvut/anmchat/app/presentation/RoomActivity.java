@@ -43,7 +43,6 @@ public class RoomActivity extends Activity implements View.OnClickListener {
         setTitle(getTitle() + " - " + this.roomName);
 
         if (myHash == null) {
-            // toast generate new hash
             Toast.makeText(this.getApplicationContext(), "Sorry, you haven't hash id, please wait a few seconds.", Toast.LENGTH_SHORT).show();
             this.finish();
         }
@@ -68,11 +67,27 @@ public class RoomActivity extends Activity implements View.OnClickListener {
     }
 
     private void setList() {
-        new GetMessagesAsyncTask().execute(this.getApplicationContext());
+        try {
+            this.list = new GetMessagesUC().getAll(this.roomId);
+            ListView msgList = (ListView) findViewById(R.id.list);
+            MessageAdapter adapter = new MessageAdapter(this.list, getApplicationContext());
+            msgList.setAdapter(adapter);
+            msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                }
+            });
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
     }
 
     private void createMessage(String message) {
-        new CreateMessageAsyncTask().execute(new Message(this.myHash, message));
+        try {
+            new CreateMessageUC().create(new Message(this.myHash, message), this.roomId);
+        } catch (BusinessException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -86,53 +101,6 @@ public class RoomActivity extends Activity implements View.OnClickListener {
                 break;
             default:
                 Log.e("MSL", "Undefined button pressed.");
-        }
-    }
-
-    private class GetMessagesAsyncTask extends AsyncTask<Context, Void, LinkedList<Message>> {
-
-        @Override
-        protected LinkedList<Message> doInBackground(Context... c) {
-            GetMessagesUC uc = new GetMessagesUC();
-            LinkedList<Message> list = new LinkedList<Message>();
-            try {
-                list = uc.getAll();
-            } catch (BusinessException e) {
-                Log.e("ERROR", e.getMessage());
-            } finally {
-                return list;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(final LinkedList<Message> messages) {
-            super.onPostExecute(messages);
-            list = messages;
-            runOnUiThread(new Runnable(){
-                public void run(){
-                    ListView msgList = (ListView) findViewById(R.id.list);
-                    MessageAdapter adapter = new MessageAdapter(messages, getApplicationContext());
-                    msgList.setAdapter(adapter);
-                    msgList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    private class CreateMessageAsyncTask extends AsyncTask<Message, Void, Void> {
-        @Override
-        protected Void doInBackground(Message... m) {
-            try {
-                new CreateMessageUC().create(m[0]);
-                Toast.makeText(getApplicationContext(), m[0].getMessage(), Toast.LENGTH_SHORT).show();
-            } catch (BusinessException e) {
-                Log.e("ERROR", e.getMessage());
-            }
-            return null;
         }
     }
 }

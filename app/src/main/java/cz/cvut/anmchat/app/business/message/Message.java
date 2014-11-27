@@ -9,6 +9,7 @@ public class Message {
     private String author;
     private String message;
     private String date;
+    private String user_hash;
 
     public Message(String author, String message) {
         this.author = author;
@@ -36,6 +37,14 @@ public class Message {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getUser_hash() {
+        return user_hash;
+    }
+
+    public void setUser_hash(String user_hash) {
+        this.user_hash = user_hash;
     }
 
     public String getMessage() {
