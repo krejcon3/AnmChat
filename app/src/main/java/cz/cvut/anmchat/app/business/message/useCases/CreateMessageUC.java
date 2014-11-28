@@ -24,7 +24,6 @@ public class CreateMessageUC extends AbstractRESTUC {
         try {
             Gson gson = new Gson();
             String s = gson.toJson(new NewMessage(msg.getMessage(), msg.getAuthor()));
-            Log.i("MESSAGES:", s);
             String response = client.execute("http://via.kopriva.net/chat/message/" + roomId, s).get();
         } catch (InterruptedException e) {
             throw new BusinessException(e.getMessage());

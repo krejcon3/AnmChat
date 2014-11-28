@@ -24,7 +24,6 @@ public class CreateRoomUC extends AbstractRESTUC {
             Gson gson = new Gson();
             String s = gson.toJson(room);
             String response = client.execute("http://via.kopriva.net/chat/room", s).get();
-            Log.i("TEST - - - -", s);
         } catch (InterruptedException e) {
             throw new BusinessException(e.getMessage());
         } catch (ExecutionException e) {

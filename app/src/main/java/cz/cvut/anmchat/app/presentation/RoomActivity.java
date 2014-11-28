@@ -99,7 +99,7 @@ public class RoomActivity extends Activity implements View.OnClickListener {
                 this.setList();
                 break;
             default:
-                Log.e("MSL", "Undefined button pressed.");
+                return;
         }
     }
 }
